@@ -100,3 +100,12 @@ function animation(time: number) {
 }
 
 renderer.setAnimationLoop(animation);
+
+const cursorLocation = {
+  x:0,
+  y:0
+};
+window.addEventListener('mousemove', (event) => {
+  cursorLocation.x = event.clientX;
+  cursorLocation.y = event.clientY;
+});
