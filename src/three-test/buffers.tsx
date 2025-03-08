@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 const renderer = new THREE.WebGLRenderer();
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = true; // Set the renderer to generate shadowmap
 
 const canvas = renderer.domElement;
 document.body.appendChild(canvas);
@@ -32,54 +32,81 @@ loadingManager.onLoad = () => {
   console.log("hi");
 };
 
-const boxGeometry = new THREE.BoxGeometry();
-const boxMaterial = new THREE.MeshStandardMaterial({
+const material = new THREE.MeshStandardMaterial({
+  color: "#ffffff",
   metalness: 0.5,
 });
-const box = new THREE.Mesh(boxGeometry, boxMaterial);
-box.position.set(1, 2, 3);
+const boxGeometry = new THREE.BoxGeometry();
+const box = new THREE.Mesh(boxGeometry, material);
+box.position.set(0, 1, 0);
+box.castShadow = true; // Mark the object to cast shadows.
+
+const planeGeometry = new THREE.PlaneGeometry(5, 5);
+const plane = new THREE.Mesh(planeGeometry, material);
+plane.rotation.x = -Math.PI / 2;
+plane.receiveShadow = true; // Mark the object to receive shadows
+
 scene.add(box);
+scene.add(plane);
 
 const light = new THREE.DirectionalLight();
-// light.color = new THREE.Color("#FFFFFF");
+light.castShadow = true; // mark the light to cast shadow
+light.position.y = 3;
+
+// Shadow quality. Must be a multiply of 2
+light.shadow.mapSize.width = 1024;
+light.shadow.mapSize.height = 1024;
+
+// Adjust the light's camera fulcrum
+light.shadow.camera.near = 1;
+light.shadow.camera.far = 4;
+light.shadow.camera.top = 2;
+light.shadow.camera.bottom = -2;
+light.shadow.camera.left = -2;
+light.shadow.camera.right = 2;
+
 scene.add(light);
 
-const geometry = new THREE.BufferGeometry();
-// create a simple square shape. We duplicate the top left and bottom right
-// vertices because each vertex needs to appear once per triangle.
-const vertices = new Float32Array([
-  -1.0,
-  -1.0,
-  1.0, // v0
-  1.0,
-  -1.0,
-  1.0, // v1
-  1.0,
-  1.0,
-  1.0, // v2
+// Helper to visualize the fulcrum
+const lightCameraHelper = new THREE.CameraHelper(light.shadow.camera);
+scene.add(lightCameraHelper);
 
-  1.0,
-  1.0,
-  1.0, // v3
-  -1.0,
-  1.0,
-  1.0, // v4
-  -1.0,
-  -1.0,
-  1.0, // v5
-]);
+// const geometry = new THREE.BufferGeometry();
+// // create a simple square shape. We duplicate the top left and bottom right
+// // vertices because each vertex needs to appear once per triangle.
+// const vertices = new Float32Array([
+//   -1.0,
+//   -1.0,
+//   1.0, // v0
+//   1.0,
+//   -1.0,
+//   1.0, // v1
+//   1.0,
+//   1.0,
+//   1.0, // v2
 
-// itemSize = 3 because there are 3 values (components) per vertex
-geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
-const material = new THREE.MeshBasicMaterial({
-  color: 0xff0000,
-  wireframe: true,
-});
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+//   1.0,
+//   1.0,
+//   1.0, // v3
+//   -1.0,
+//   1.0,
+//   1.0, // v4
+//   -1.0,
+//   -1.0,
+//   1.0, // v5
+// ]);
+
+// // itemSize = 3 because there are 3 values (components) per vertex
+// geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+// const material = new THREE.MeshBasicMaterial({
+//   color: 0xff0000,
+//   wireframe: true,
+// });
+// const mesh = new THREE.Mesh(geometry, material);
+// scene.add(mesh);
 
 function animation(time: number) {
-  box.rotation.x = Math.sin(time);
+  box.rotation.x = Math.sin(time / 1000);
   renderer.render(scene, camera);
 }
 
