@@ -1,7 +1,12 @@
-import "./App.css";
+import { Canvas } from "@react-three/fiber";
+import ExperienceExample from "./react_three_fiber_test/experience_example";
 
 function App() {
-  return <div>Hello world!</div>;
+  return (
+    <Canvas>
+      <ExperienceExample />
+    </Canvas>
+  );
 }
 
 export default App;
